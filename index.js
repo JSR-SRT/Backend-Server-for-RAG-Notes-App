@@ -4,7 +4,7 @@ import helmet from "helmet";
 import cors from "cors";
 import apiRoutes from "./api/v1/routes.js";
 import { connectMongo } from "./config/mongo.js";
-// import { connectTurso, db } from "./config/turso.js";
+import { connectTurso, db } from "./config/turso.js";
 import limiter from "./middleware/rateLimiter.js";
 import errorHandler from "./middleware/errorHandler.js";
 import cookieParser from "cookie-parser";
@@ -33,7 +33,7 @@ app.use(limiter);
 app.use(express.json());
 app.use(cookieParser());
 // Centralized routes
-app.use("/", apiRoutes());
+app.use("/", apiRoutes(db));
 app.get("/", (_req, res) => {
   res.send(`
       <!DOCTYPE html>
@@ -90,8 +90,8 @@ const PORT = process.env.PORT || 3000;
 (async () => {
   try {
     await connectMongo();
-    // await connectTurso();
-    app.listen(PORT, () => {
+    await connectTurso();
+    app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server listening on port ${PORT} ✅`);
     });
   } catch (err) {
